@@ -6,9 +6,18 @@
 	</head>
 	<body>
 		<form>
-			<input type="button" value="Run maze generator" onclick="test()"/>
+			<label for="rows">Number of rows:</label>
+			<input type="number" id="rows" name="rows">
+			<br>
+			<label for="cols">Number of columns:</label>
+			<input type="number" id="cols" name="cols">
+			<br>
+			<label for="wrap">Cylindrical maze?</label>
+			<input type="checkbox" id="wrap" name="wrap">
+			<br>
+			<input type="button" value="Run maze generator" onclick="run()"/>
 		</form>
-		<canvas id="maze" width="800" height="400" style="border:1px solid #000000">
+		<canvas id="maze" width="0" height="0" style="border:0px solid #000000">
 		</canvas>
 		<script src="maze.js"></script>
 	</body>
