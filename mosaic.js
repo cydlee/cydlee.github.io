@@ -11,17 +11,90 @@ window.addEventListener('load', ()=>{
 	colInput.addEventListener ('input', () => {grid.updateCols ();});
 	grid.updateRows ();
 	grid.updateCols ();
+	// Color buttons
+	mouse.setColor ('b116', '#e5fcd9');
+	document.getElementById ("erase").onclick = function () { mouse.setColor ('erase', '#ffffff'); };
+	document.getElementById ("b116").onclick = function () { mouse.setColor ('b116', '#e5fcd9'); };
+	document.getElementById ("b115").onclick = function () { mouse.setColor ('b115', '#cbdf80'); };
+	document.getElementById ("b119").onclick = function () { mouse.setColor ('b119', '#9cd37f'); };
+	document.getElementById ("b118").onclick = function () { mouse.setColor ('b118', '#3b7f19'); };
 });
-    
+
 const canvas = document.querySelector ('#canvas');
 const rowInput = document.querySelector ('#rows');
 const colInput = document.querySelector ('#cols');
-// Context for the canvas for 2 dimensional operations
-const ctx = canvas.getContext('2d');
+const ctx = canvas.getContext('2d'); // Context for the canvas for 2 dimensional operations
 
-const DEFAULT_COLOR = '#ff0000';
+const DEFAULT_COLOR = '#ffffff';
 
-let mouse = {x: 0, y: 0, down: false};
+let mouse =
+{
+	x: 0,
+	y: 0,
+	r: 0,
+	c: 0,
+	down: false,
+	color: '#e5fcd9',
+	selected: 'b116',
+	
+	// Update the x and y of the mouse position
+	updateXY: function (event)
+	{
+		this.x = event.layerX - canvas.offsetLeft;
+		this.y = event.layerY - canvas.offsetTop;
+		document.getElementById ("xCoord").innerHTML = this.x;
+		document.getElementById ("yCoord").innerHTML = this.y;
+	},
+
+	// Update the row and column of the mouse position (uses x and y)
+	updateRC: function ()
+	{
+		let relX = this.x - grid.x;
+		let relY = this.y - grid.y;
+		relX /= grid.tile;
+		relY /= grid.tile;
+		document.getElementById ("rowCoord").innerHTML = this.r = Math.floor (relY);
+		document.getElementById ("colCoord").innerHTML = this.c = Math.floor (relX);
+	},
+
+	// Set the color of the mouse and select in in HTML
+	setColor (id, newColor)
+	{
+		document.getElementById (this.selected).className = '';
+		this.selected = id;
+		document.getElementById (this.selected).className = 'selected';
+		this.color = newColor;
+	}
+};
+
+function updateMousePos (event)
+{
+	mouse.updateXY (event);
+	mouse.updateRC ();
+	if (mouse.down)
+		grid.changeColor ();
+	grid.draw ();
+}
+
+function mouseDown (event)
+{
+	mouse.down = true;
+	updateMousePos (event);
+}
+
+function mouseUp ()
+{
+	mouse.down = false;
+}
+
+// Resizes the canvas to the available size of the window.
+function resize ()
+{
+	ctx.canvas.width = window.innerWidth;
+	ctx.canvas.height = window.innerHeight - canvas.offsetTop;
+	grid.updateTile ();
+	grid.draw ();
+}
 
 let grid =
 {
@@ -32,20 +105,7 @@ let grid =
 	width: 200,
 	height: 200,
 	tile: 20,
-	mouseR: 0,
-	mouseC: 0,
 	colors: [],
-
-	// Update the mouse row and column based on mouse XY; can only be called after updating mouse XY
-	updateMouseRC: function ()
-	{
-		let relX = mouse.x - this.x;
-		let relY = mouse.y - this.y;
-		relX /= this.tile;
-		relY /= this.tile;
-		document.getElementById ("rowCoord").innerHTML = this.mouseR = Math.floor (relY);
-		document.getElementById ("colCoord").innerHTML = this.mouseC = Math.floor (relX);
-	},
 
 	// Draw the mosaic grid
 	draw: function ()
@@ -176,40 +236,9 @@ let grid =
 	// Changes colors in the grid when mouse is down
 	changeColor ()
 	{
-		if (this.mouseR >= 0 && this.mouseR < this.rows && this.mouseC >= 0 && this.mouseC < this.cols)
+		if (mouse.r >= 0 && mouse.r < this.rows && mouse.c >= 0 && mouse.c < this.cols)
 		{
-			this.colors[this.mouseR][this.mouseC] = '#0000ff';
+			this.colors[mouse.r][mouse.c] = mouse.color;
 		}
 	}
 };
-
-function updateMousePos (event)
-{
-	mouse.x = event.layerX - canvas.offsetLeft;
-	mouse.y = event.layerY - canvas.offsetTop;
-	document.getElementById ("xCoord").innerHTML = mouse.x;
-	document.getElementById ("yCoord").innerHTML = mouse.y;
-	grid.updateMouseRC ();
-	if (mouse.down)
-		grid.changeColor ();
-	grid.draw ();
-}
-
-function mouseDown (event)
-{
-	mouse.down = true;
-	updateMousePos (event);
-}
-
-function mouseUp ()
-{
-	mouse.down = false;
-}
-
-// Resizes the canvas to the available size of the window.
-function resize ()
-{
-	ctx.canvas.width = window.innerWidth;
-	ctx.canvas.height = window.innerHeight - canvas.offsetTop;
-	grid.draw ();
-}
