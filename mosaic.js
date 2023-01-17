@@ -26,6 +26,10 @@ const colInput = document.querySelector ('#cols');
 const ctx = canvas.getContext('2d'); // Context for the canvas for 2 dimensional operations
 
 const DEFAULT_COLOR = '#ffffff';
+const B116 = '#e5fcd9';
+const B115 = '#cbdf80';
+const B119 = '#9cd37f';
+const B118 = '#3b7f19';
 
 let mouse =
 {
@@ -148,6 +152,30 @@ let grid =
 		}
 	},
 
+	// Update numbers of color tiles
+	updateNumbers ()
+	{
+		b116 = 0;
+		b115 = 0;
+		b119 = 0;
+		b118 = 0;
+		for (r = 0; r < this.rows; r++)
+		{
+			for (c = 0; c < this.cols; c++)
+			{
+				if (this.colors[r][c] == B116) b116++;
+				if (this.colors[r][c] == B115) b115++;
+				if (this.colors[r][c] == B119) b119++;
+				if (this.colors[r][c] == B118) b118++;
+			}
+		}
+		console.log (document.getElementById ('b116-number').innerHTML);
+		document.getElementById ('b116-number').innerHTML = '(' + b116 + ')';
+		document.getElementById ('b115-number').innerHTML = '(' + b115 + ')';
+		document.getElementById ('b119-number').innerHTML = '(' + b119 + ')';
+		document.getElementById ('b118-number').innerHTML = '(' + b118 + ')';
+	},
+
 	// Updates XY
 	updateXY ()
 	{
@@ -179,6 +207,7 @@ let grid =
 		if (this.rows > this.colors.length)
 			this.addRows (this.rows - this.colors.length);
 		this.draw ();
+		this.updateNumbers ();
 	},
 
 	// Updates this.cols and dependencies
@@ -191,6 +220,7 @@ let grid =
 		if (this.cols > this.colors[0].length)
 			this.addCols (this.cols - this.colors[0].length);
 		this.draw ();
+		this.updateNumbers ();
 	},
 
 	// Initializes the color grid using this.rows and this.cols with DEFAULT_COLOR
@@ -240,5 +270,6 @@ let grid =
 		{
 			this.colors[mouse.r][mouse.c] = mouse.color;
 		}
+		this.updateNumbers ();
 	}
 };
